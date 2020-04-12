@@ -36,8 +36,10 @@ with references between various datasets.
 ## How is data stored in the api?
 
 The api uses in memory [H2 database](https://www.h2database.com/html/main.html) to store the data.
-However the entire imdb dataset is not loaded. Only a few titles and names are filled by the api as part 
-of a small migration that happens on bootup.
+However the entire imdb dataset is not loaded. Only a few titles and names are loaded by api as part 
+of a migration script that runs on bootup.
+
+Check `V1__create_todo.sql` for what data is inserted.
 
 Fetching data from  [IMDb Datasets](https://www.imdb.com/interfaces/) at runtime and storing them
 into a db via steaming is a different challenge that this particular project does not tackle at the moment.
