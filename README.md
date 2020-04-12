@@ -1,36 +1,32 @@
-# todo-http4s-doobie
-A sample project of a microservice using [http4s](http://http4s.org/), [doobie](http://tpolecat.github.io/doobie/),
+# IMDB Search
+A sample project using [http4s](http://http4s.org/), [doobie](http://tpolecat.github.io/doobie/),
 and [circe](https://github.com/circe/circe).
 
-The microservice allows CRUD of todo items with a description and an importance (high, medium, low).
+The microservice allows following rest api calls.
 
 ## End points
 The end points are:
 
-Method | Url         | Description
------- | ----------- | -----------
-GET    | /todos      | Returns all todos.
-GET    | /todos/{id} | Returns the todo for the specified id, 404 when no todo present with this id.
-POST   | /todos      | Creates a todo, give as body JSON with the description and importance, returns a 201 with the created todo.
-PUT    | /todos/{id} | Updates an existing todo, give as body JSON with the description and importance, returns a 200 with the updated todo when a todo is present with the specified id, 404 otherwise.
-DELETE | /todos/{id} | Deletes the todo with the specified todo, 404 when no todo present with this id.
+Method | Url                                               | Description
+------ | -----------                                       | -----------
+GET    | /istypecasted?name=actorname                      | Returns "yes" or "no" indicating if an actor is typecased.
+GET    | /matchingtitles?firstname=first&secondname=second | Returns list of matching titles for first and second actor, 404 when no matching titles are found.
+POST   | /associationWithKB?name=actorname                 | Determins the degree of an actor/actress from Kavin Bacon. 404 if no such actor/actress is present
+
+
 
 Here are some examples on how to use the microservice with curl, assuming it runs on the default port 8080:
 
-Create a todo:
-```curl -X POST --header "Content-Type: application/json" --data '{"description": "my todo", "importance": "high"}' http://localhost:8080/todos```
 
-Get all todos:
-```curl http://localhost:8080/todos```
+Check if Al Pacino is typecasted:
+```curl http://localhost:8080/istypecasted?name=Al%20Pacino```
 
-Get a single todo (assuming the id of the todo is 1):
-```curl http://localhost:8080/todos/1```
+Get matching list of titles for Al Pacino and Marlon Brando:
+```curl http://localhost:8080/matchingtitles?firstname=Al%20Pacino&secondname=Marlon%20Brando```
 
-Update a todo (assuming the id of the todo is 1):
-```curl -X PUT --header "Content-Type: application/json" --data '{"description": "my todo", "importance": "low"}' http://localhost:8080/todos/1```
+Get Degree of association for Al Pacino with Kavin Bacon:
+```curl http://localhost:8080/associationWithKB?name=Al%20Pacino```
 
-Delete a todo (assuming the id of the todo is 1):
-```curl -X DELETE http://localhost:8080/todos/1```
 
 ## http4s
 [http4s](http://http4s.org/) is used as the HTTP layer. http4s provides streaming and functional HTTP for Scala.
@@ -66,7 +62,7 @@ microservice is lost.
 Using [Flyway](https://flywaydb.org/) the database migrations are performed when starting the server.
 
 ## Tests
-This example project contains both unit tests, which mock the repository that accesses the database, and
+This example project contains both unit tests, which mock the infrastructure.repository that accesses the database, and
 integration tests that use the [http4s](http://http4s.org/) HTTP client to perform actual requests.
 
 ## Running

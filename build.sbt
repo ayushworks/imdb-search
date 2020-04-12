@@ -1,5 +1,5 @@
 lazy val commonSettings = Seq(
-  name := "todo http4s doobie",
+  name := "Imdb Search Service",
   version := "1.0-SNAPSHOT",
   scalaVersion := "2.12.8",
   scalacOptions ++= Seq(

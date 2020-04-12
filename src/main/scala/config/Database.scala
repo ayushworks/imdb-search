@@ -1,7 +1,6 @@
-package db
+package config
 
 import cats.effect.IO
-import config.DatabaseConfig
 import doobie.hikari.HikariTransactor
 import org.flywaydb.core.Flyway
 
