@@ -2,16 +2,16 @@
 A sample project using [http4s](http://http4s.org/), [doobie](http://tpolecat.github.io/doobie/),
 and [circe](https://github.com/circe/circe).
 
-The microservice allows following rest api calls.
+
 
 ## End points
-The end points are:
+The rest resources that this api provides are:
 
 Method | Url                                               | Description
 ------ | -----------                                       | -----------
-GET    | /istypecasted?name=actorname                      | Returns "yes" or "no" indicating if an actor is typecased.
+GET    | /istypecasted?name=actorname                      | Returns "yes" or "no" indicating if an actor is typecasted.
 GET    | /matchingtitles?firstname=first&secondname=second | Returns list of matching titles for first and second actor, 404 when no matching titles are found.
-POST   | /associationWithKB?name=actorname                 | Determins the degree of an actor/actress from Kavin Bacon. 404 if no such actor/actress is present
+POST   | /associationWithKB?name=actorname                 | Determines the degree of an actor/actress from Kavin Bacon. 404 if no such actor/actress is present
 
 
 
@@ -26,6 +26,46 @@ Get matching list of titles for Al Pacino and Marlon Brando:
 
 Get Degree of association for Al Pacino with Kavin Bacon:
 ```curl http://localhost:8080/associationWithKB?name=Al%20Pacino```
+
+# Data source
+The source of the data that the api uses is [IMDb Datasets](https://www.imdb.com/interfaces/)
+
+The data contains information about titles of movies, tv-serials , actors/actress etc. The data is relational in nature
+with references between various datasets.
+
+## How is data stored in the api?
+
+The api uses in memory [H2 database](https://www.h2database.com/html/main.html) to store the data.
+However the entire imdb dataset is not loaded. Only a few titles and names are filled by the api as part 
+of a small migration that happens on bootup.
+
+Fetching data from  [IMDb Datasets](https://www.imdb.com/interfaces/) at runtime and storing them
+into a db via steaming is a different challenge that this particular project does not tackle at the moment.
+
+# Data model
+
+## Titles
+
+```scala
+case class Title(tconst: String, titleType: String, primaryTitle: String,
+                 originalTitle: String, isAdult: String, startYear: Int,
+                 endYear: Option[Int], runTimeInMinutes: Int, genres: String)
+```
+
+## Names
+
+```scala
+case class Name(nconst: String, primaryName: String, birthYear: Int, deathYear: Option[Int], primaryProfession: String, knownForTitles: String)
+```
+
+# Error handling
+
+The api captures errors at various level : service, repository. All known business errors are represented
+by a type `BusinessError`. 
+
+All service layer methods return an `Either[BusinessError,A]` type. To be more precise , since
+we use the [IO](https://typelevel.org/cats-effect/datatypes/io.html) monad to represent side effects , the type returned by most methods is
+`EitherT[IO, BusinessError, A]` which is aliased as `ResultT[A]` in the entire api
 
 
 ## http4s

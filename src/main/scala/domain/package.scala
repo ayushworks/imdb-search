@@ -6,6 +6,8 @@ package object domain {
     val message: String
   }
 
+  case class IllegalArgumentError(message: String) extends BusinessError
+
   case class NotFoundError(message: String) extends BusinessError
 
   type ResultT[A] = EitherT[IO, BusinessError, A]

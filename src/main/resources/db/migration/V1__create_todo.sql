@@ -1,26 +1,3 @@
-CREATE TABLE todo (
-  id SERIAL PRIMARY KEY,
-  description TEXT,
-  importance TEXT
-);
-
-CREATE TABLE titleakas (
- titleId VARCHAR2(255) PRIMARY KEY,
- ordering INT,
- title VARCHAR2(255),
- region VARCHAR2(255),
- language VARCHAR2(255),
- types VARCHAR2(1024),
- attributes VARCHAR2(1024),
- isoriginaltitle VARCHAR2(1)
-);
-
-CREATE TABLE titleratings (
- tconst VARCHAR2(255) PRIMARY KEY,
- averagerating DOUBLE NOT NULL,
- numvotes INT
-);
-
 CREATE TABLE titlebasics (
  tconst VARCHAR2(255) PRIMARY KEY,
  titletype VARCHAR2(255) NOT NULL,
@@ -59,11 +36,6 @@ INSERT INTO titlebasics(TCONST, TITLETYPE, PRIMARYTITLE, ORIGINALTITLE, ISADULT,
 VALUES ('tt0164052','movie','Hollow Man','Hollow Man',0,2000,null,112,'Action,Horror,Sci-Fi');
 INSERT INTO titlebasics(TCONST, TITLETYPE, PRIMARYTITLE, ORIGINALTITLE, ISADULT, STARTYEAR, ENDYEAR, RUNTIMEMINUTES, GENRES)
 VALUES ('tt0087277','movie','Footloose','Footloose',0,1984,null,107,'Music,Romance');
-
-
-
-
-
 
 
 INSERT INTO names(NCONST, PRIMARYNAME, BIRTHYEAR, DEATHYEAR, PRIMARYPROFESSION, KNOWNFORTITLES)

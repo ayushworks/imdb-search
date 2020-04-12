@@ -18,8 +18,9 @@ class SearchService(nameRepo: NameRepository, titleRepo: TitleRepository) {
     if(artistName == kevinBacon) EitherT.rightT[IO, BusinessError](1)
     else {
       for {
-        name <- nameRepo.getByName(artistName)
-        titles = name.titleIds
+        name <- EitherT.fromEither[IO](verifyNotEmpty(artistName))
+        nameFromDb <- nameRepo.getByName(artistName)
+        titles = nameFromDb.titleIds
         result <- EitherT.liftF(getCount(titles, 0, Set.empty[String]))
       } yield result
     }
@@ -36,8 +37,10 @@ class SearchService(nameRepo: NameRepository, titleRepo: TitleRepository) {
     } yield currentCount
   }
 
-  def getCommonTitles(firstName: String, secondName: String): ResultT[List[Title]] = {
+  def getCommonTitles(firstArtistName: String, secondArtistName: String): ResultT[List[Title]] = {
     for {
+      firstName <- EitherT.fromEither[IO](verifyNotEmpty(firstArtistName))
+      secondName <- EitherT.fromEither[IO](verifyNotEmpty(secondArtistName))
       names <- EitherT.liftF(nameRepo.getByNames(NonEmptySet.of(firstName, secondName)))
       commonTitles = names.foldLeft(names.headOption.map(_.titleIds).getOrElse(Set.empty[String])){
         case (common, name) => common & name.titleIds
@@ -49,7 +52,8 @@ class SearchService(nameRepo: NameRepository, titleRepo: TitleRepository) {
 
   def getTitles(artistName: String): ResultT[List[Title]] = {
     for {
-      nameFromDb <- nameRepo.getByName(artistName)
+      name <- EitherT.fromEither[IO](verifyNotEmpty(artistName))
+      nameFromDb <- nameRepo.getByName(name)
       titleIds =  nameFromDb.titleIds
       titleNes <- nesFromSet(titleIds, NotFoundError(s"No matching titles for $artistName"))
       titles <- EitherT.liftF(titleRepo.getByIds(titleNes))
@@ -63,5 +67,10 @@ class SearchService(nameRepo: NameRepository, titleRepo: TitleRepository) {
         map + (genre -> (map.get(genre).getOrElse(0) + 1))
     }
     genreCount.find(_._2 > (totalWork/2)).isDefined
+  }
+
+  private def verifyNotEmpty(input: String): Either[BusinessError, String] = {
+    if(input.isEmpty) Left(IllegalArgumentError("name cannnot be empty"))
+    else Right(input)
   }
 }
