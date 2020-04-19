@@ -1,18 +1,20 @@
-import cats.effect.IO
+import cats.effect.{ContextShift, ExitCode, IO, Timer}
 import config.{Config, Database}
-import domain.SearchService
+import domain.{DataLoader, SearchService}
 import infrastructure.endpoints.EndPoints
-import io.circe.Json
-import io.circe.literal._
-import org.http4s.client.blaze.Http1Client
-import org.http4s.{Method, Request, Status, Uri}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
-import org.http4s.server.{Server => Http4sServer}
-import org.http4s.server.blaze.BlazeBuilder
+import org.http4s.server.blaze.{BlazeServerBuilder}
 import infrastructure.repository.{NameRepository, TitleRepository}
+import cats.implicits._
+import scala.concurrent.ExecutionContext
 
 class TodoServerSpec extends WordSpec with Matchers with BeforeAndAfterAll {
-  private lazy val client = Http1Client[IO]().unsafeRunSync()
+
+  private lazy val config = Config.load("test.conf").unsafeRunSync()
+
+  private val server = runServer.unsafeRunSync()
+
+  /*private lazy val client = Http1Client[IO].
 
   private lazy val config = Config.load("test.conf").unsafeRunSync()
 
@@ -93,16 +95,35 @@ class TodoServerSpec extends WordSpec with Matchers with BeforeAndAfterAll {
     }
   }
 
-  private def createServer(): IO[Http4sServer[IO]] = {
+
+   */
+
+  implicit val timer: Timer[IO] = IO.timer(ExecutionContext.global)
+
+  implicit val contextShift: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
+
+  def runServer: IO[ExitCode] = {
     for {
+      config <- Config.load()
       transactor <- Database.transactor(config.database)
       _ <- Database.initialize(transactor)
       nameRepo = new NameRepository(transactor)
       titleRepo = new TitleRepository(transactor)
+      dbLoader = new DataLoader
+      _ <- IO.shift *> dbLoader.load(file = config.files.names , rowExtractor = DataLoader.dataToName, rowSaver = nameRepo.insertTitle).start
+      _ <- IO.shift *> dbLoader.load(file = config.files.titles , rowExtractor = DataLoader.dataToTitle, rowSaver = titleRepo.insertTitle).start
       searchService = new SearchService(nameRepo, titleRepo)
-      server <- BlazeBuilder[IO]
-        .bindHttp(config.server.port, config.server.host)
-        .mountService(new EndPoints(searchService).service, "/").start
-    } yield server
+      httpService = new EndPoints(searchService)
+      exitCode <- run(httpService, config)
+    } yield exitCode
   }
+
+  def run(endPoints: EndPoints, config: Config): IO[ExitCode] =
+    BlazeServerBuilder[IO]
+      .bindHttp(config.server.port, config.server.host)
+      .withHttpApp(endPoints.service)
+      .serve
+      .compile
+      .drain
+      .as(ExitCode.Success)
 }

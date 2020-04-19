@@ -7,7 +7,9 @@ package object config {
 
   case class DatabaseConfig(driver: String, url: String, user: String, password: String)
 
-  case class Config(server: ServerConfig, database: DatabaseConfig)
+  case class FilesConfig(names: String, titles: String)
+
+  case class Config(server: ServerConfig, database: DatabaseConfig, files: FilesConfig)
 
   object Config {
     import pureconfig._

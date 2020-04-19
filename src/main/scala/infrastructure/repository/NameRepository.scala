@@ -35,7 +35,7 @@ class NameRepository(transactor: Transactor[IO]) {
     query.query[Name].to[List].transact(transactor)
   }
 
-  def createName(name: Name): IO[Name] = {
+  def insertTitle(name: Name): IO[Name] = {
     sql"INSERT INTO names (NCONST, PRIMARYNAME, BIRTHYEAR, DEATHYEAR, PRIMARYPROFESSION, KNOWNFORTITLES) VALUES (${name.nconst}, ${name.primaryName}, ${name.birthYear}, ${name.deathYear}, ${name.primaryProfession}, ${name.knownForTitles})"
       .update.run.transact(transactor).map(_ => name)
   }

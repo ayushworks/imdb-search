@@ -10,7 +10,7 @@ lazy val commonSettings = Seq(
   ),
 )
 
-lazy val Http4sVersion = "0.18.22"
+lazy val Http4sVersion = "0.20.0"
 
 lazy val DoobieVersion = "0.5.4"
 
@@ -56,6 +56,10 @@ lazy val root = (project in file("."))
       "ch.qos.logback"        %  "logback-classic"      % LogbackVersion,
 
       "org.scalatest"         %% "scalatest"            % ScalaTestVersion  % "it,test",
-      "org.scalamock"         %% "scalamock"            % ScalaMockVersion  % "test"
+      "org.scalamock"         %% "scalamock"            % ScalaMockVersion  % "test",
+      "com.github.tototoshi"  %% "scala-csv"            % "1.3.6",
+      "org.typelevel"         %% "cats-effect"          % "2.0.0",
+      "org.typelevel"         %% "cats-core"            % "2.0.0",
+      "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.2"
     )
   )

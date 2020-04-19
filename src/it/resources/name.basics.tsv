@@ -1,0 +1,10 @@
+nconst	primaryName	birthYear	deathYear	primaryProfession	knownForTitles
+nm0000199	Al Pacino	1940	\N	actor,producer,soundtrack	tt0072890,tt0070666,tt0068646,tt0099422
+nm0000008	Marlon Brando	1924	2004	actor,soundtrack,director	tt0044081,tt0068646,tt0070849,tt0078788
+nm0000102	Kevin Bacon	1958	\N	actor,producer,soundtrack	tt0327056,tt0361127,tt0164052,tt0087277
+nm0000989	One	1958	\N	actor,producer,soundtrack	tt0327056,tt111
+nm0000990	Two	1958	\N	actor,producer,soundtrack	tt222,tt111
+nm0000991	Three	1958	\N	actor,producer,soundtrack	tt333,tt222
+nm0000992	Four	1958	\N	actor,producer,soundtrack	tt444,tt333
+nm0000993	Five	1958	\N	actor,producer,soundtrack	tt555,tt444
+

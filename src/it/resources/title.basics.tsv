@@ -1,0 +1,9 @@
+tconst	titleType	primaryTitle	originalTitle	isAdult	startYear	endYear	runtimeMinutes	genres
+tt0072890	movie	Dog Day Afternoon	Dog Day Afternoon	0	1975	\N	125	Biography,Crime,Drama
+tt0070666	movie	Serpico	Serpico	0	1973	\N	130	Biography,Crime,Drama
+tt0068646	movie	The Godfather	The Godfather	0	1972	\N	175	Crime,Drama
+tt0099422	movie	Dick Tracy	Dick Tracy	0	1990	\N	105	Action,Comedy,Crime
+tt0327056	movie	Mystic River	Mystic River	0	2003	\N	138	Crime,Drama,Mystery
+tt0361127	movie	The Woodsman	The Woodsman	0	2004	\N	87	Drama
+tt0164052	movie	Hollow Man	Hollow Man	0	2000	\N	112	Action,Horror,Sci-Fi
+tt0087277	movie	Footloose	Footloose	0	1984	\N	107	Drama,Music,Romance

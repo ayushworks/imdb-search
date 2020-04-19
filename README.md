@@ -36,14 +36,8 @@ with references between various datasets.
 ## How is data stored in the api?
 
 The api uses in memory [H2 database](https://www.h2database.com/html/main.html) to store the data.
-However the entire imdb dataset is not loaded. Only a few titles and names are loaded by api as part 
-of a migration script that runs on bootup.
 
-Check `V1__create_todo.sql` for what data is inserted.
-
-Fetching data from  [IMDb Datasets](https://www.imdb.com/interfaces/) at runtime and storing them
-into a db via steaming is a different challenge that this particular project does not tackle at the moment.
-
+Data loading starts as the server boots up and continous in the background while the server is ready to serve request. 
 # Data model
 
 ## Titles
@@ -110,3 +104,5 @@ integration tests that use the [http4s](http://http4s.org/) HTTP client to perfo
 ## Running
 You can run the microservice with `sbt run`. By default it listens to port number 8080, you can change
 this in the `application.conf`.
+
+Please sepcify the location of `title.basics.tsv` and `name.basics.tsv` in application.conf to load the required data

@@ -4,9 +4,10 @@ import cats.effect.IO
 import domain.{BusinessError, IllegalArgumentError, NotFoundError, SearchService}
 import io.circe.generic.auto._
 import io.circe.syntax._
-import org.http4s.{HttpService, Response}
+import org.http4s.{HttpRoutes, Response}
 import org.http4s.circe._
 import org.http4s.dsl.Http4sDsl
+import org.http4s._, org.http4s.dsl.io._, org.http4s.implicits._
 
 class EndPoints(searchService: SearchService) extends Http4sDsl[IO] {
 
@@ -17,7 +18,7 @@ class EndPoints(searchService: SearchService) extends Http4sDsl[IO] {
   object SecondNameQueryParamMatcher extends QueryParamDecoderMatcher[String]("secondname")
 
 
-  val service = HttpService[IO] {
+  val service = HttpRoutes.of[IO] {
     case GET -> Root / "istypecasted" :? NameQueryParamMatcher(name) =>
       searchService.getTitles(name).value.flatMap {
         case Left(businessError) => matchError(businessError)
@@ -35,7 +36,7 @@ class EndPoints(searchService: SearchService) extends Http4sDsl[IO] {
         case Left(businessError) => matchError(businessError)
         case Right(value) => Ok(value.toString)
       }
-  }
+  }.orNotFound
 
   private def matchError(businessError: BusinessError): IO[Response[IO]] =
     businessError match {
