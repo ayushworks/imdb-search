@@ -2,44 +2,45 @@ package domain
 
 import cats.{Parallel, Traverse}
 import cats.effect.concurrent.Semaphore
-import cats.effect.{Concurrent, ContextShift, IO, Resource}
+import cats.effect.{Concurrent, ContextShift, IO, Resource, Timer}
 import com.github.tototoshi.csv.{CSVReader, TSVFormat}
 import domain.model.{Name, Title}
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
+import fs2.Stream
 
+import scala.io.Source
 import scala.util.Try
+import scala.concurrent.duration._
 
 /**
   * @author Ayush Mittal
   */
 class DataLoader extends LazyLogging {
 
-  def load[A](file : String, rowExtractor: Map[String,String] => A, rowSaver: A => IO[A])(implicit F: Concurrent[IO], P: Parallel[IO], CS: ContextShift[IO]) = {
+  def load[A](file : String, rowExtractor: Map[String,String] => A, rowSaver: A => IO[A])(implicit F: Concurrent[IO], P: Parallel[IO], CS: ContextShift[IO], T: Timer[IO]) = {
     loadFile(file).use {
       reader =>
-        val loaderProgram = reader.iteratorWithHeaders.zipWithIndex.map{
-          case (row, _) =>
-              logger.info(s"extracting and inserting $row")
-              rowExtractor(row)
-        }.toList
-        parTraverseN(1000, loaderProgram)(rowSaver)
+        val fs2Stream = Stream.fromIterator(reader.iteratorWithHeaders).evalMap(x => rowSaver(rowExtractor(x)))
+        fs2Stream.chunkLimit(100).evalTap(chunk => IO(println(s"Processing batch of ${chunk.size} elements"))).compile.toList
     }
   }
 
-  private def parTraverseN[A,B](n: Int, ga: List[A])(f: A => IO[B])(implicit F: Concurrent[IO], P: Parallel[IO], CS: ContextShift[IO])=
+  /*private def parTraverseN[A,B](n: Int, ga: Stream[A])(f: A => IO[B])(implicit F: Concurrent[IO], P: Parallel[IO], CS: ContextShift[IO])=
     Semaphore[IO](n).flatMap {
       s =>
         ga.parTraverse(a => s.withPermit(CS.shift *> f(a).onError{
           case t: Throwable =>
             logger.error(s"unable to insert data in database", t)
             IO.unit
+        }.flatTap{
+          row => IO(logger.info(s"extracting and inserted $row"))
         }))
-    }
+    }*/
 
   private def loadFile(file: String): Resource[IO, CSVReader] = {
     Resource.make{
-      IO(CSVReader.open(file)(tsv)).onError{
+      IO(CSVReader.open(Source.fromResource(file))(tsv)).onError{
         case t: Throwable =>
           logger.error(s"unable to load $file", t)
           IO.unit

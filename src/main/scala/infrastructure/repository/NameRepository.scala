@@ -3,9 +3,10 @@ package infrastructure.repository
 import cats.data.EitherT
 import cats.effect.IO
 import doobie.util.transactor.Transactor
-import domain.model.{Name}
+import domain.model.Name
 import doobie.implicits._
 import cats.data.NonEmptySet
+import com.typesafe.scalalogging.LazyLogging
 import domain.{NotFoundError, ResultT}
 import doobie.util.fragment.Fragment
 import doobie.util.fragments
@@ -13,7 +14,7 @@ import doobie.util.fragments
 /**
   * @author Ayush Mittal
   */
-class NameRepository(transactor: Transactor[IO]) {
+class NameRepository(transactor: Transactor[IO]) extends LazyLogging {
 
   def getByName(artistName: String): ResultT[Name] = {
     val queryFragment = fr"SELECT NCONST, PRIMARYNAME, BIRTHYEAR, DEATHYEAR, PRIMARYPROFESSION, KNOWNFORTITLES FROM names where" ++ fr"LOWER(PRIMARYNAME) = ${artistName.toLowerCase}"
@@ -35,8 +36,12 @@ class NameRepository(transactor: Transactor[IO]) {
     query.query[Name].to[List].transact(transactor)
   }
 
-  def insertTitle(name: Name): IO[Name] = {
+  def insertName(name: Name): IO[Name] = {
     sql"INSERT INTO names (NCONST, PRIMARYNAME, BIRTHYEAR, DEATHYEAR, PRIMARYPROFESSION, KNOWNFORTITLES) VALUES (${name.nconst}, ${name.primaryName}, ${name.birthYear}, ${name.deathYear}, ${name.primaryProfession}, ${name.knownForTitles})"
-      .update.run.transact(transactor).map(_ => name)
+      .update.run.transact(transactor).map{
+        value =>
+          logger.info(s"inserted into names and return is $value")
+         name
+    }
   }
 }

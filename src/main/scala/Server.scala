@@ -15,7 +15,7 @@ object Server extends IOApp {
       nameRepo = new NameRepository(transactor)
       titleRepo = new TitleRepository(transactor)
       dbLoader = new DataLoader
-      _ <- IO.shift *> dbLoader.load(file = config.files.names , rowExtractor = DataLoader.dataToName, rowSaver = nameRepo.insertTitle).start
+      _ <- IO.shift *> dbLoader.load(file = config.files.names , rowExtractor = DataLoader.dataToName, rowSaver = nameRepo.insertName).start
       _ <- IO.shift *> dbLoader.load(file = config.files.titles , rowExtractor = DataLoader.dataToTitle, rowSaver = titleRepo.insertTitle).start
       searchService = new SearchService(nameRepo, titleRepo)
       httpService = new EndPoints(searchService)

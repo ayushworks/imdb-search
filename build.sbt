@@ -28,6 +28,8 @@ lazy val ScalaTestVersion = "3.0.5"
 
 lazy val ScalaMockVersion = "4.1.0"
 
+lazy val CatsVersion = "2.0.0"
+
 lazy val root = (project in file("."))
   .configs(IntegrationTest)
   .settings(
@@ -58,8 +60,8 @@ lazy val root = (project in file("."))
       "org.scalatest"         %% "scalatest"            % ScalaTestVersion  % "it,test",
       "org.scalamock"         %% "scalamock"            % ScalaMockVersion  % "test",
       "com.github.tototoshi"  %% "scala-csv"            % "1.3.6",
-      "org.typelevel"         %% "cats-effect"          % "2.0.0",
-      "org.typelevel"         %% "cats-core"            % "2.0.0",
+      "org.typelevel"         %% "cats-effect"          % CatsVersion,
+      "org.typelevel"         %% "cats-core"            % CatsVersion,
       "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.2"
     )
   )

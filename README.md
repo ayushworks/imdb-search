@@ -105,4 +105,4 @@ integration tests that use the [http4s](http://http4s.org/) HTTP client to perfo
 You can run the microservice with `sbt run`. By default it listens to port number 8080, you can change
 this in the `application.conf`.
 
-Please sepcify the location of `title.basics.tsv` and `name.basics.tsv` in application.conf to load the required data
+Please copy the `title.basics.tsv` and `name.basics.tsv` in `src\main\resources` to load the required data
