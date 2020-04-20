@@ -1,14 +1,12 @@
 package domain
 
-import cats.{Parallel, Traverse}
-import cats.effect.concurrent.Semaphore
+import cats.{Parallel}
 import cats.effect.{Concurrent, ContextShift, IO, Resource, Timer}
 import com.github.tototoshi.csv.{CSVReader, TSVFormat}
 import domain.model.{Name, Title}
 import cats.implicits._
 import com.typesafe.scalalogging.LazyLogging
 import fs2.Stream
-
 import scala.io.Source
 import scala.util.Try
 import scala.concurrent.duration._
@@ -22,7 +20,7 @@ class DataLoader extends LazyLogging {
     loadFile(file).use {
       reader =>
         val fs2Stream = Stream.fromIterator(reader.iteratorWithHeaders).evalMap(x => rowSaver(rowExtractor(x)))
-        fs2Stream.chunkLimit(100).evalTap(chunk => IO(println(s"Processing batch of ${chunk.size} elements"))).compile.toList
+        fs2Stream.compile.toList
     }
   }
 
